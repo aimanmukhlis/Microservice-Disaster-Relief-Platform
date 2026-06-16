@@ -170,7 +170,7 @@ async function startServer() {
             }
         });
 
-        const PORT = process.env.PORT || 3003;
+        const PORT = process.env.PORT || 7020;
         app.listen(PORT, () => {
             console.log(`🚀 Inventory Microservice backend running on port ${PORT}`);
         });
