@@ -22,9 +22,7 @@ app.use((req, res, next) => {
 // 2. ROUTING RULE 1: Forward inventory traffic to the Resource Management Service (Port 7020)
 app.use('/api/resources', proxy(process.env.RESOURCE_SERVICE_URL, {
     proxyReqPathResolver: (req) => {
-        // Appends the remaining path parameters after /api/resources
-        // Example: /api/resources/inventory -> http://localhost:7020/api/resources/inventory
-        return `/api/resources${req.url}`;
+        return `/api/v1/admin${req.url}`;
     }
 }));
 
