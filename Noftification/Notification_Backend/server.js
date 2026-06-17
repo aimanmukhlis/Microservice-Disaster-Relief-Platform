@@ -3,64 +3,48 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
-app.use(express.json()); // Middleware to parse incoming JSON payloads
+app.use(express.json());
 
 const PORT = process.env.PORT || 8020;
 
-// Setup the mock email transporter (Mocking an external channel provider)
+// Setup Gmail Transporter
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
+    service: 'gmail', // Shortcut parameter for Gmail architecture mapping
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: process.env.EMAIL_USER, // Your full gmail address
+        pass: process.env.EMAIL_PASS  // The 16-character App Password
     }
 });
 
-/**
- * POST /api/notifications/send
- * Triggered internally by Reporting Service or Communication Service
- */
 app.post('/api/notifications/send', async (req, res) => {
     const { type, recipient, message, priority } = req.body;
 
-    // 1. Basic validation
     if (!recipient || !message || !type) {
-        return res.status(400).json({ error: 'Missing required fields: type, recipient, or message.' });
+        return res.status(400).json({ error: 'Missing fields.' });
     }
 
     try {
-        console.log(`[Notification Service] Processing ${priority || 'NORMAL'} priority ${type} alert...`);
-
-        // 2. Route alert to the appropriate external channel
         if (type === 'EMAIL') {
             await transporter.sendMail({
-                from: '"Disaster Relief Platform" <alerts@disaster-relief.gov.my>',
+                from: process.env.EMAIL_USER, // Gmail requires this to match the auth user
                 to: recipient,
                 subject: priority === 'HIGH' ? '🚨 CRITICAL EMERGENCY ALERT' : 'Platform Notification',
                 text: message
             });
-            console.log(`[Notification Service] Email successfully sent to ${recipient}`);
-        } 
-        
-        else if (type === 'SMS') {
-            // Mocking an external SMS Gateway API dispatch (e.g., Twilio)
-            console.log(`[SMS Gateway Redirect] Blasting text to ${recipient}: "${message}"`);
+            console.log(`[Notification Service] Real Gmail sent to ${recipient}`);
         }
 
-        // 3. Stateless confirmation response sent back to the triggering service
         return res.status(200).json({
             status: 'SUCCESS',
-            message: `Notification successfully dispatched via ${type}.`
+            message: `Notification successfully sent via Gmail.`
         });
 
     } catch (error) {
         console.error('[Notification Service Error]:', error.message);
-        return res.status(500).json({ error: 'Failed to dispatch notification to external channel.' });
+        return res.status(500).json({ error: error.message });
     }
 });
 
-// Start the server
 app.listen(PORT, () => {
-    console.log(`✅ Stateless Notification Backend running on port ${PORT}`);
+    console.log(`✅ Notification Backend running on port ${PORT}`);
 });
