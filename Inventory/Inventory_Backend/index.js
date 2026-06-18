@@ -171,7 +171,7 @@ async function startServer() {
         });
 
         const PORT = process.env.PORT || 7020;
-        app.listen(PORT, () => {
+        app.listen(PORT,'0.0.0.0', () => {
             console.log(`🚀 Inventory Microservice backend running on port ${PORT}`);
         });
 
