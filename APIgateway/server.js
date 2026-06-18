@@ -33,6 +33,14 @@ app.use('/api/notifications', proxy(process.env.NOTIFICATION_SERVICE_URL, {
     }
 }));
 
+// 4. ROUTING RULE 3: Forward PUBLIC inventory requests to Resource Management Service
+app.use('/api/v1/public/inventory', proxy(process.env.RESOURCE_SERVICE_URL, {
+    proxyReqPathResolver: (req) => {
+        // This takes the incoming request and passes it perfectly to the backend
+        return `/api/v1/public/inventory${req.url}`;
+    }
+}));
+
 // Base health check path to ensure the gateway container is alive
 app.get('/health', (req, res) => {
     res.status(200).json({ status: "UP", gateway: "Operational" });
