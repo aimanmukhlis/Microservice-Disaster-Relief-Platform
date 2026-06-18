@@ -1,42 +1,68 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const { MongoClient } = require('mongodb'); 
 require('dotenv').config();
+const dns = require("dns"); 
 
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 8020;
 
-// Setup Gmail Transporter
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Shortcut parameter for Gmail architecture mapping
-    auth: {
-        user: process.env.EMAIL_USER, // Your full gmail address
-        pass: process.env.EMAIL_PASS  // The 16-character App Password
+let db, notificationsCollection;
+
+// Connect to MongoDB
+const client = new MongoClient(process.env.MONGO_URI);
+async function connectDB() {
+    try {
+        await client.connect();
+        db = client.db('notification_db');
+        notificationsCollection = db.collection('notifications');
+        console.log('✅ Connected to MongoDB Native Driver!');
+    } catch (error) {
+        console.error('❌ MongoDB Connection Error:', error);
+    }
+}
+connectDB();
+
+// Fetch history for the UI Bell Icon
+app.get('/api/notifications/history', async (req, res) => {
+    try {
+        const history = await notificationsCollection
+            .find({})
+            .sort({ timestamp: -1 }) // Newest first
+            .limit(50)
+            .toArray(); 
+            
+        res.status(200).json(history);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch history.' });
     }
 });
 
+// Save to DB (No Email)
 app.post('/api/notifications/send', async (req, res) => {
-    const { type, recipient, message, priority } = req.body;
+    const { message, priority } = req.body;
 
-    if (!recipient || !message || !type) {
+    // Notice we removed 'recipient' and 'type' because it's strictly system-wide now!
+    if (!message || !priority) {
         return res.status(400).json({ error: 'Missing fields.' });
     }
 
     try {
-        if (type === 'EMAIL') {
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER, // Gmail requires this to match the auth user
-                to: recipient,
-                subject: priority === 'HIGH' ? '🚨 CRITICAL EMERGENCY ALERT' : 'Platform Notification',
-                text: message
-            });
-            console.log(`[Notification Service] Real Gmail sent to ${recipient}`);
-        }
+        // Insert directly into the database
+        await notificationsCollection.insertOne({
+            title: priority === 'HIGH' ? 'Critical Alert' : 'Supply Request',
+            message: message,
+            priority: priority,
+            timestamp: new Date() 
+        });
+
+        console.log(`[Notification Service] In-app alert saved: ${message}`);
 
         return res.status(200).json({
             status: 'SUCCESS',
-            message: `Notification successfully sent via Gmail.`
+            message: `In-app notification saved to database.`
         });
 
     } catch (error) {
