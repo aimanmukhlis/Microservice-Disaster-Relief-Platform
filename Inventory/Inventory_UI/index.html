@@ -20,9 +20,23 @@
                 <h5 class="mb-0">Find & Request Resources</h5>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">Item Name (e.g., Water, Medical Kit, Blanket)</label>
-                    <input type="text" id="searchKeyword" class="form-control" placeholder="Search for supplies...">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Item Name (e.g., Water, Medical Kit, Blanket)</label>
+                        <input type="text" id="searchKeyword" class="form-control" placeholder="Search for supplies...">
+                    </div>
+                    <div class="col-md-4 mt-3 mt-md-0">
+                        <label class="form-label">Filter by Type</label>
+                        <select id="filterType" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="food">Food</option>
+                            <option value="drink">Drink</option>
+                            <option value="medicine">Medicine</option>
+                            <option value="toiletries">Toiletries</option>
+                            <option value="tools">Tools</option>
+                            <option value="clothing">Clothing</option>
+                        </select>
+                    </div>
                 </div>
                 <button class="btn btn-primary" onclick="findResources()">Search Supplies</button>
             </div>
@@ -80,18 +94,25 @@
         
         let currentItemId = ''; 
         let requestModal; 
-        let currentMaxStock = 0; // Added to strictly track stock
+        let currentMaxStock = 0; 
 
         // 1. Find Resources
         function findResources() {
             const keyword = document.getElementById('searchKeyword').value.trim();
+            // 🟢 ADDED: Capture the value from the dropdown
+            const itemType = document.getElementById('filterType').value;
             
-            fetch(`${GATEWAY_URL}/api/v1/public/inventory/search?keyword=${encodeURIComponent(keyword)}`)
+            // 🟢 ADDED: Use URLSearchParams to safely build the query string with both variables
+            const queryParams = new URLSearchParams();
+            if (keyword) queryParams.append('keyword', keyword);
+            if (itemType) queryParams.append('itemType', itemType);
+
+            // 🟢 ADDED: Append the new query string to the fetch URL
+            fetch(`${GATEWAY_URL}/api/v1/public/inventory/search?${queryParams.toString()}`)
                 .then(response => response.json())
                 .then(data => displayResults(data))
                 .catch(err => {
                     console.error(err);
-                    // 💡 FIX: Updated error message to correctly reference Port 4000
                     alert("Error fetching data. Is your API Gateway running on Port 4000?");
                 });
         }
@@ -129,7 +150,7 @@
         // 3. Open Request Modal
         function openModal(itemId, centerName, availableStock) {
             currentItemId = itemId; 
-            currentMaxStock = availableStock; // Save globally for validation
+            currentMaxStock = availableStock; 
             
             document.getElementById('modalCenterName').value = centerName;
             document.getElementById('displayCenterName').innerText = centerName;
@@ -146,7 +167,6 @@
         }
 
         // 4. Submit the Request
-        // 💡 FIX: Takes 'event' parameter to prevent default form submission reload
         async function submitRequest(event) {
             event.preventDefault(); 
 
@@ -154,7 +174,6 @@
             const quantity = parseInt(document.getElementById('requestQuantity').value);
             const urgency = document.getElementById('requestUrgency').value;
 
-            // 💡 FIX: Extra JS validation layer
             if(quantity > currentMaxStock) {
                 alert("You cannot request more than the available stock.");
                 return;
