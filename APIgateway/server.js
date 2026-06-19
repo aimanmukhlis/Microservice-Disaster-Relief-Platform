@@ -41,6 +41,23 @@ app.use('/api/v1/public/inventory', proxy(process.env.RESOURCE_SERVICE_URL, {
     }
 }));
 
+// 🟢 NEW: Forward Notification History requests to the Notification Service
+app.get('/api/notifications/history', async (req, res) => {
+    try {
+        // The Gateway reaches out to the hidden Notification app on the internal Docker network
+        const response = await fetch(`${process.env.NOTIFICATION_SERVICE_URL}/api/notifications/history`);
+        
+        if (!response.ok) throw new Error('Failed to fetch from Notification Service');
+        
+        const data = await response.json();
+        
+        // The Gateway hands the data back to the frontend
+        res.status(200).json(data);
+    } catch (error) {
+        console.error('[Gateway Error]: Notification Service offline', error.message);
+        res.status(500).json({ error: 'Notification Service is currently unavailable.' });
+    }
+});
 // Base health check path to ensure the gateway container is alive
 app.get('/health', (req, res) => {
     res.status(200).json({ status: "UP", gateway: "Operational" });

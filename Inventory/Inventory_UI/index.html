@@ -3,31 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disaster Relief - User Dashboard</title>
+    <title>Disaster Relief System - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="data:,">
+
+    <style>
+body{
+    background:#F1F5F9;
+    min-height:100vh;
+}
+
+/* HEADER */
+.main-header{
+    background:linear-gradient(135deg,#0F172A,#1E3A8A);
+    color:white;
+    height:80px;
+    position:fixed;
+    top:0;
+    left:250px;
+    right:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    padding:0 30px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:250px;
+    height:100vh;
+    position:fixed;
+    top:0;
+    left:0;
+    background:#1E293B;
+    color:white;
+    z-index:1001;
+    box-shadow:4px 0 15px rgba(0,0,0,0.15);
+}
+
+.sidebar-brand{
+    height:80px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+    font-weight:700;
+    background:#0F172A;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar .nav-link{
+    color:#CBD5E1;
+    padding:15px 25px;
+    font-weight:500;
+    border-radius:10px;
+    margin:5px 10px;
+    transition:all 0.3s ease;
+}
+
+.sidebar .nav-link:hover{
+    background:#3B82F6;
+    color:white;
+    transform:translateX(5px);
+}
+
+.sidebar .nav-link.active{
+    background:#2563EB;
+    color:white;
+}
+
+/* MAIN CONTENT */
+.main-content{
+    margin-left:250px;
+    margin-top:100px;
+    padding:30px;
+}
+
+/* CARD */
+.card{
+    border:none;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+.card-header{
+    background:#EFF6FF;
+    color:#1E40AF;
+    font-weight:bold;
+}
+
+/* BUTTONS */
+.btn-primary{
+    background:#2563EB;
+    border:none;
+}
+
+.btn-primary:hover{
+    background:#1D4ED8;
+}
+</style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5 mb-5">
-        
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Victim / Volunteer Portal</h2>
-            <span class="badge bg-info text-dark">Logged in as: Requestor</span>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="sidebar-brand">
+    </div>
+
+    <ul class="nav flex-column mt-3">
+
+        <li class="nav-item">
+            <a class="nav-link" href="/reports/index.html">
+                Reporting Service
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="/volunteers/index.html">
+                Volunteer Task Service
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link active" href="/resources/index.html">
+                Inventory Service
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="/communications/index.html">
+                Communication Service
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+<!-- TOP HEADER -->
+<header class="main-header">
+
+    <div class="d-flex justify-content-between align-items-center w-100">
+
+        <div>
+            <h3 class="mb-0 fw-bold">
+                Disaster Relief Coordination Platform
+            </h3>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Find & Request Resources</h5>
+        <div class="d-flex align-items-center gap-3">
+
+    <div class="dropdown">
+
+        <button
+            class="btn btn-light position-relative rounded-pill fw-semibold shadow-sm"
+            type="button"
+            data-bs-toggle="dropdown"
+            onclick="fetchNotifications()">
+
+            🔔 Alerts
+
+            <span
+                class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-white rounded-circle"
+                id="notificationBadge">
+            </span>
+
+        </button>
+
+        <ul
+            class="dropdown-menu dropdown-menu-end shadow"
+            id="notificationList"
+            style="width:320px;max-height:400px;overflow-y:auto;">
+        </ul>
+
+    </div>
+
+    <button
+        class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm"
+        onclick="logout()">
+
+        Logout
+
+    </button>
+
+</div>
+
+    </div>
+
+</header>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="dropdown">
+                            <button class="btn btn-light border text-dark position-relative rounded-pill fw-semibold shadow-sm" type="button" data-bs-toggle="dropdown" onclick="fetchNotifications()">
+                                🔔 Alerts
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-2 border-white rounded-circle" id="notificationBadge">
+                                    <span class="visually-hidden">New alerts</span>
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3" id="notificationList" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                                <li><span class="dropdown-item text-muted text-center py-3">Click to load notifications...</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row mb-3">
+        </nav>
+    </header>
+
+<div class="main-content">
+        
+        <div class="mb-4 border-start border-primary border-4 ps-3">
+            <h2 class="text-dark fw-bold mb-0">Victim / Volunteer Portal</h2>
+        </div>
+
+        <div class="card shadow-sm mb-4 border-0 rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 text-primary fw-bold">Find & Request Resources</h5>
+            </div>
+            <div class="card-body p-4 bg-white">
+                <div class="row mb-4">
                     <div class="col-md-8">
-                        <label class="form-label">Item Name (e.g., Water, Medical Kit, Blanket)</label>
-                        <input type="text" id="searchKeyword" class="form-control" placeholder="Search for supplies...">
+                        <label class="form-label fw-bold text-dark">Item Name (e.g., Water, Medical Kit, Blanket)</label>
+                        <input type="text" id="searchKeyword" class="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Search for supplies...">
                     </div>
                     <div class="col-md-4 mt-3 mt-md-0">
-                        <label class="form-label">Filter by Type</label>
-                        <select id="filterType" class="form-select">
+                        <label class="form-label fw-bold text-dark">Filter by Type</label>
+                        <select id="filterType" class="form-select form-select-lg bg-light border-0 shadow-sm">
                             <option value="">All Types</option>
                             <option value="food">Food</option>
                             <option value="drink">Drink</option>
@@ -38,48 +241,52 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="findResources()">Search Supplies</button>
+                <button class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm fw-bold" onclick="findResources()">Search Supplies</button>
             </div>
         </div>
 
-        <div class="card shadow-sm" id="resultsArea" style="display: none;">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Available Relief Centers</h5>
+        <div class="card shadow-sm border-0 rounded-3" id="resultsArea" style="display: none;">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 text-success fw-bold">Available Relief Centers (within 50km)</h5>
             </div>
-            <div class="card-body">
-                <ul class="list-group" id="resultsList"></ul>
+            <div class="card-body p-0 bg-white">
+                <ul class="list-group list-group-flush rounded-bottom" id="resultsList"></ul>
             </div>
         </div>
     </div>
 
     <div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title">Request Supplies</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-white border-bottom">
+                    <h5 class="modal-title fw-bold text-primary">Request Supplies</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="requestForm" onsubmit="submitRequest(event)">
-                    <div class="modal-body">
+                    <div class="modal-body bg-white">
                         <input type="hidden" id="modalCenterName">
-                        <p><strong>Relief Center:</strong> <span id="displayCenterName"></span></p>
-                        <p><strong>Available Stock:</strong> <span id="displayStock"></span></p>
+                        
+                        <div class="alert alert-primary bg-primary-subtle border-0 shadow-sm rounded-3 text-dark">
+                            <p class="mb-1"><strong>Relief Center:</strong> <span id="displayCenterName"></span></p>
+                            <p class="mb-0"><strong>Available Stock:</strong> <span id="displayStock" class="badge bg-primary rounded-pill"></span></p>
+                        </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Quantity Needed</label>
-                            <input type="number" id="requestQuantity" class="form-control" min="1" required>
+                            <label class="form-label fw-bold text-dark">Quantity Needed</label>
+                            <input type="number" id="requestQuantity" class="form-control form-control-lg bg-light border-0 shadow-sm" min="1" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Urgency</label>
-                            <select id="requestUrgency" class="form-select">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Urgency Status</label>
+                            <select id="requestUrgency" class="form-select form-select-lg bg-light border-0 shadow-sm">
                                 <option value="Low">Low (Within 24 Hours)</option>
                                 <option value="High">High (Immediate Need)</option>
                             </select>
+                            <div class="form-text mt-2">High urgency requests are prioritized by the Reporting Module.</div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Submit Request</button>
+                    <div class="modal-footer border-top bg-white rounded-bottom">
+                        <button type="button" class="btn btn-light rounded-pill px-4 border shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">Submit Request</button>
                     </div>
                 </form>
             </div>
@@ -89,25 +296,63 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // SINGLE ENTRY POINT: API Gateway
         const GATEWAY_URL = 'http://localhost:4000';
         
         let currentItemId = ''; 
         let requestModal; 
         let currentMaxStock = 0; 
 
-        // 1. Find Resources
+        async function fetchNotifications() {
+            const list = document.getElementById('notificationList');
+            const badge = document.getElementById('notificationBadge');
+            
+            if (badge) badge.classList.add('d-none'); 
+            
+            list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">Loading...</span></li>';
+
+            try {
+                const response = await fetch(`${GATEWAY_URL}/api/notifications/history`);
+                
+                if (response.ok) {
+                    const notifications = await response.json();
+                    list.innerHTML = ''; 
+                    
+                    if (notifications.length === 0) {
+                        list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">No new alerts.</span></li>';
+                    } else {
+                        notifications.forEach(notif => {
+                            const date = new Date(notif.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            
+                            list.innerHTML += `
+                                <li>
+                                    <div class="dropdown-item border-bottom py-3 list-group-item-action text-wrap">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong>${notif.priority === 'HIGH' ? '<span class="text-danger">🚨 Critical Alert</span>' : '<span class="text-primary">ℹ️ System Update</span>'}</strong>
+                                            <span class="badge bg-light text-dark border rounded-pill">${date}</span>
+                                        </div>
+                                        <p class="mb-0 text-dark small">${notif.message}</p>
+                                    </div>
+                                </li>
+                            `;
+                        });
+                    }
+                } else {
+                    throw new Error('Failed to load');
+                }
+            } catch (error) {
+                console.error("Failed to load notifications:", error);
+                list.innerHTML = '<li><span class="dropdown-item text-danger text-center py-3">Failed to connect to Database.</span></li>';
+            }
+        }
+
         function findResources() {
             const keyword = document.getElementById('searchKeyword').value.trim();
-            // 🟢 ADDED: Capture the value from the dropdown
             const itemType = document.getElementById('filterType').value;
             
-            // 🟢 ADDED: Use URLSearchParams to safely build the query string with both variables
             const queryParams = new URLSearchParams();
             if (keyword) queryParams.append('keyword', keyword);
             if (itemType) queryParams.append('itemType', itemType);
 
-            // 🟢 ADDED: Append the new query string to the fetch URL
             fetch(`${GATEWAY_URL}/api/v1/public/inventory/search?${queryParams.toString()}`)
                 .then(response => response.json())
                 .then(data => displayResults(data))
@@ -117,28 +362,27 @@
                 });
         }
 
-        // 2. Display Results
         function displayResults(data) {
             const resultsArea = document.getElementById('resultsArea');
             const resultsList = document.getElementById('resultsList');
             resultsList.innerHTML = '';
 
             if (!data || data.length === 0) {
-                resultsList.innerHTML = '<li class="list-group-item text-danger">No matching supplies found.</li>';
+                resultsList.innerHTML = '<li class="list-group-item text-danger text-center py-4 fw-bold border-0">No matching supplies found within 50km.</li>';
             } else {
                 data.forEach(item => {
                     const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center p-4 border-bottom';
                     
                     li.innerHTML = `
                         <div>
-                            <strong>${item.centerId.name}</strong> <br>
-                            <small class="text-muted">Item: ${item.itemName} (${item.itemType})</small> <br>
-                            <span class="badge bg-success">Stock: ${item.availableStock}</span>
+                            <h5 class="mb-1 fw-bold text-dark">${item.centerId.name}</h5>
+                            <small class="text-secondary d-block mb-2 fs-6">Item: <strong class="text-dark">${item.itemName}</strong> &bull; Type: <span class="text-capitalize text-dark">${item.itemType}</span></small>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 shadow-sm border border-success-subtle">Stock Available: ${item.availableStock}</span>
                         </div>
-                        <button class="btn btn-sm btn-warning shadow-sm" 
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" 
                             onclick="openModal('${item.itemId}', '${item.centerId.name}', ${item.availableStock})">
-                            Request Supply
+                            Request
                         </button>
                     `;
                     resultsList.appendChild(li);
@@ -147,7 +391,6 @@
             resultsArea.style.display = 'block';
         }
 
-        // 3. Open Request Modal
         function openModal(itemId, centerName, availableStock) {
             currentItemId = itemId; 
             currentMaxStock = availableStock; 
@@ -166,7 +409,6 @@
             requestModal.show();
         }
 
-        // 4. Submit the Request
         async function submitRequest(event) {
             event.preventDefault(); 
 
@@ -206,6 +448,24 @@
                 alert("Cannot connect to API Gateway. Is your router service operational?");
             }
         }
+        function logout() {
+
+    if(confirm("Are you sure you want to logout?")) {
+
+        // Clear session storage
+        sessionStorage.clear();
+
+        // Clear local storage
+        localStorage.clear();
+
+        // Redirect to Authentication Service
+        window.location.href = "http://localhost:7000/login.html";
+
+        // Alternative paths:
+        // window.location.href = "/auth/login.html";
+        // window.location.href = "/authentication/index.html";
+    }
+}
     </script>
 </body>
 </html>
