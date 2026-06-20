@@ -1,10 +1,11 @@
 // server.js (Inventory Microservice)
 require('dotenv').config();
 const express = require('express');
-const { MongoClient } = require('mongodb'); 
+const { MongoClient, ObjectId } = require('mongodb'); 
 const cors = require('cors');
 const dns = require("dns"); 
 
+// Force DNS resolution for certain deployment environments
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
@@ -16,6 +17,30 @@ let db, inventoryCollection;
 
 const ALLOWED_ITEM_TYPES = ['food', 'drink', 'medicine', 'toiletries', 'tools', 'clothing'];
 
+// 🟢 FIXED: Maps directly to the Docker environment injection key or container domain fallback
+const GIS_URL = process.env.GIS_SERVICE_URL || 'http://gis-service-app:7030';
+const BROKER_URL = 'http://notification-app:8020/api/notifications/publish';
+
+/**
+ * Helper function to safely dispatch messages to the central Message Broker
+ */
+async function publishSystemAlert(message, priority = 'INFO') {
+    try {
+        await fetch(BROKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message,
+                priority,
+                source: 'INVENTORY_SERVICE'
+            })
+        });
+        console.log(`[BROKER] Published alert successfully: "${message}"`);
+    } catch (error) {
+        console.error(`[BROKER ERROR] Could not contact message broker:`, error.message);
+    }
+}
+
 async function startServer() {
     try {
         await client.connect();
@@ -25,16 +50,15 @@ async function startServer() {
         inventoryCollection = db.collection('Resources');
 
         // ==========================================
-        // ADMIN ENDPOINTS (Middleware Removed - Protection Handled by Gateway)
+        // ADMIN ENDPOINTS (Database Management)
         // ==========================================
 
-        // 🟢 CREATE
         app.post('/api/v1/admin/inventory', async (req, res) => {
             try {
-                const { itemId, itemName, quantity, location, itemType } = req.body;
+                const { itemId, itemName, quantity, location, latitude, longitude, itemType } = req.body;
 
-                if (!itemId || !itemName || quantity === undefined || !location || !itemType) {
-                    return res.status(400).json({ error: "Missing required fields." });
+                if (!itemId || !itemName || quantity === undefined || !location || !itemType || latitude === undefined || longitude === undefined) {
+                    return res.status(400).json({ error: "Missing required fields. Please ensure latitude and longitude are included." });
                 }
 
                 const normalizedType = itemType.toLowerCase().trim();
@@ -43,25 +67,23 @@ async function startServer() {
                 }
 
                 const newSupply = {
-                    _id: itemId.trim().toUpperCase(), 
+                    itemId: itemId.trim().toUpperCase(), 
                     itemName: itemName.trim(),
                     quantity: Number(quantity),
                     itemType: normalizedType,       
                     location: location.trim(),
+                    latitude: Number(latitude),
+                    longitude: Number(longitude),
                     lastUpdated: new Date()
                 };
 
                 const result = await inventoryCollection.insertOne(newSupply);
                 res.status(201).json({ message: "Supply added successfully", id: result.insertedId });
             } catch (error) {
-                if (error.code === 11000) {
-                    return res.status(400).json({ error: `An item with custom ID '${req.body.itemId}' already exists.` });
-                }
                 res.status(500).json({ error: "Failed to add supply" });
             }
         });
 
-        // 🔵 READ ALL ADMIN
         app.get('/api/v1/admin/inventory', async (req, res) => {
             try {
                 const supplies = await inventoryCollection.find({}).toArray();
@@ -71,10 +93,9 @@ async function startServer() {
             }
         });
 
-        // 🟠 UPDATE
         app.put('/api/v1/admin/inventory/:id', async (req, res) => {
             try {
-                const id = req.params.id.trim().toUpperCase(); 
+                const id = req.params.id;
                 const normalizedType = req.body.itemType?.toLowerCase().trim();
 
                 if (normalizedType && !ALLOWED_ITEM_TYPES.includes(normalizedType)) {
@@ -91,7 +112,7 @@ async function startServer() {
 
                 Object.keys(updatedSupply).forEach(key => updatedSupply[key] === undefined && delete updatedSupply[key]);
 
-                const result = await inventoryCollection.updateOne({ _id: id }, { $set: updatedSupply });
+                const result = await inventoryCollection.updateOne({ _id: new ObjectId(id) }, { $set: updatedSupply });
                 if (result.matchedCount === 0) return res.status(404).json({ error: "Supply item not found" });
                 res.status(200).json({ message: "Supply updated successfully" });
             } catch (error) {
@@ -99,11 +120,10 @@ async function startServer() {
             }
         });
 
-        // 🔴 DELETE
         app.delete('/api/v1/admin/inventory/:id', async (req, res) => {
             try {
-                const id = req.params.id.trim().toUpperCase();
-                const result = await inventoryCollection.deleteOne({ _id: id }); 
+                const id = req.params.id;
+                const result = await inventoryCollection.deleteOne({ _id: new ObjectId(id) }); 
                 if (result.deletedCount === 0) return res.status(404).json({ error: "Supply not found" });
                 res.status(200).json({ message: "Supply deleted successfully" });
             } catch (error) {
@@ -112,39 +132,56 @@ async function startServer() {
         });
 
         // ==========================================
-        // USER PORTAL ENDPOINTS (Public Domain Routing)
+        // PUBLIC ENDPOINTS (Handled as Orchestrator)
         // ==========================================
 
-        // 🔍 SEARCH FOR SUPPLIES
         app.get('/api/v1/public/inventory/search', async (req, res) => {
             try {
-                const searchKeyword = req.query.keyword || ""; 
-                const filterType = req.query.itemType || "";
+                const { keyword, itemType, lat, lon } = req.query;
                 const query = {};
 
-                if (searchKeyword) {
-                    query.itemName = { $regex: searchKeyword, $options: 'i' };
-                }
-                if (filterType) {
-                    query.itemType = filterType.toLowerCase().trim();
-                }
+                if (keyword) query.itemName = { $regex: keyword, $options: 'i' };
+                if (itemType) query.itemType = itemType.toLowerCase().trim();
 
                 const supplies = await inventoryCollection.find(query).toArray();
                 const formattedResults = supplies.map(item => ({
-                    itemId: item._id, 
+                    itemId: item.itemId,
                     itemName: item.itemName,
                     itemType: item.itemType,
-                    centerId: { name: item.location }, 
-                    availableStock: item.quantity
+                    centerName: item.location,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    availableQuantity: item.quantity
                 }));
 
-                res.status(200).json(formattedResults);
+                if (!lat || !lon) {
+                    return res.status(200).json({ nearbyCenters: formattedResults });
+                }
+
+                const gisPayload = {
+                    userLocation: { latitude: Number(lat), longitude: Number(lon) },
+                    centers: formattedResults
+                };
+
+                console.log(`[ORCHESTRATOR] Forwarding cross-service spatial calculation to: ${GIS_URL}`);
+                const gisResponse = await fetch(`${GIS_URL}/api/v1/gis/filter-nearby`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(gisPayload)
+                });
+
+                if (!gisResponse.ok) throw new Error(`GIS service responded with status ${gisResponse.status}`);
+                const gisData = await gisResponse.json();
+
+                res.status(200).json(gisData);
+
             } catch (error) {
-                res.status(500).json({ error: "Failed to search inventory" });
+                console.error("Search Orchestration Error:", error);
+                res.status(500).json({ error: "Failed to search and filter inventory." });
             }
         });
 
-        // 📝 REQUEST SUPPLIES
+        // 📝 REQUEST SUPPLIES (Frontend Modal Submission)
         app.post('/api/v1/public/inventory/request', async (req, res) => {
             try {
                 const { itemId, centerName, quantityNeeded } = req.body;
@@ -156,14 +193,16 @@ async function startServer() {
 
                 const targetId = itemId.trim().toUpperCase();
                 const result = await inventoryCollection.updateOne(
-                    { _id: targetId, location: centerName.trim(), quantity: { $gte: deductQty } },
+                    { itemId: targetId, location: centerName.trim(), quantity: { $gte: deductQty } },
                     { $inc: { quantity: -deductQty }, $set: { lastUpdated: new Date() } }
                 );
 
                 if (result.modifiedCount === 0) {
+                    publishSystemAlert(`CRITICAL: Request denied at ${centerName}. Insufficient stock for Item ${targetId}.`, 'HIGH');
                     return res.status(400).json({ error: "Request rejected. Insufficient stock." });
                 }
 
+                publishSystemAlert(`Resource allocation approved: ${deductQty} units of Item ${targetId} drawn from ${centerName}.`, 'INFO');
                 res.status(200).json({ message: "Request approved! Inventory updated safely." });
             } catch (error) {
                 res.status(500).json({ error: "Internal Server Error" });
@@ -171,8 +210,8 @@ async function startServer() {
         });
 
         const PORT = process.env.PORT || 7020;
-        app.listen(PORT,'0.0.0.0', () => {
-            console.log(`🚀 Inventory Microservice backend running on port ${PORT}`);
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Inventory Orchestrator backend running on port ${PORT}`);
         });
 
     } catch (error) {
@@ -183,6 +222,7 @@ async function startServer() {
 
 process.on('SIGINT', async () => {
     await client.close();
+    console.log("MongoDB connection closed.");
     process.exit(0);
 });
 

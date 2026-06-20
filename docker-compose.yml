@@ -1,0 +1,146 @@
+networks:
+  disaster-relief-net:
+    driver: bridge
+
+services:
+  # ==========================================
+  # CORE MESH INFRASTRUCTURE
+  # ==========================================
+  api-gateway:
+    build: ./APIgateway
+    container_name: api-gateway-container
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - AUTH_SERVICE_URL=http://auth-backend-app:3020
+      - REPORTING_SERVICE_URL=http://reporting-backend-app:5020
+      - RESOURCE_SERVICE_URL=http://inventory-backend-app:7020
+      - COMMUNICATION_SERVICE_URL=http://communication-backend-app:6020
+      - VOLUNTEER_SERVICE_URL=http://volunteer-backend-app:9020
+      - NOTIFICATION_SERVICE_URL=http://notification-app:8020
+      - GIS_SERVICE_URL=http://gis-service-app:7030
+    networks:
+      - disaster-relief-net
+
+  notification-broker:
+    build: ./Noftification/Notification_Backend
+    container_name: notification-app
+    ports:
+      - "8020:8020"
+    networks:
+      - disaster-relief-net
+
+  gis-service:
+    build: ./GIS
+    container_name: gis-service-app
+    ports:
+      - "7030:7030"
+    networks:
+      - disaster-relief-net
+
+  # ==========================================
+  # OPERATIONAL BACKENDS
+  # ==========================================
+  auth-backend:
+    build: ./Authentication/Backend
+    container_name: auth-backend-app
+    ports:
+      - "3020:3020"
+    environment:
+      - MONGODB_URI=mongodb+srv://s74824_db_user:Ky6VdH5cVvay6wXa@cluster0.phluhfs.mongodb.net/?appName=Cluster0
+    networks:
+      - disaster-relief-net
+    depends_on:
+      - notification-broker
+
+  reporting-backend:
+    build: ./Reporting/Backend
+    container_name: reporting-backend-app
+    ports:
+      - "5020:5020"
+    environment:
+      - MONGODB_URI=mongodb+srv://s74824_db_user:Ky6VdH5cVvay6wXa@cluster0.phluhfs.mongodb.net/?appName=Cluster0
+    networks:
+      - disaster-relief-net
+    depends_on:
+      - notification-broker
+
+  inventory-backend:
+    build: ./Inventory/Inventory_Backend
+    container_name: inventory-backend-app
+    ports:
+      - "7020:7020"
+    environment:
+      - MONGODB_URI=mongodb+srv://aimanmukhlis:admin@cluster0.phluhfs.mongodb.net/inventory_db?retryWrites=true&w=majority
+    networks:
+      - disaster-relief-net
+    depends_on:
+      - notification-broker
+
+  communication-backend:
+    build: ./Communication/Backend
+    container_name: communication-backend-app
+    ports:
+      - "6020:6020"
+    environment:
+      - MONGODB_URI=mongodb+srv://adhawhamka:Adhahamka05@cluster0.phluhfs.mongodb.net/disaster_relief_db?appName=Cluster0
+    networks:
+      - disaster-relief-net
+    depends_on:
+      - notification-broker
+
+  volunteer-backend:
+    build: ./Volunteer/Backend
+    container_name: volunteer-backend-app
+    ports:
+      - "9020:9020"
+    environment:
+      - MONGODB_URI=mongodb+srv://adhawhamka:Adhahamka05@cluster0.phluhfs.mongodb.net/disaster_relief_db?appName=Cluster0
+    networks:
+      - disaster-relief-net
+    depends_on:
+      - notification-broker
+
+  # ==========================================
+  # FRONTEND UI DASHBOARDS
+  # ==========================================
+  auth-frontend:
+    build: ./Authentication/Frontend
+    container_name: auth-frontend-container
+    ports:
+      - "3010:80"
+    networks:
+      - disaster-relief-net
+
+  reporting-frontend:
+    build: ./Reporting/Frontend
+    container_name: reporting-frontend-container
+    ports:
+      - "5010:80"
+    networks:
+      - disaster-relief-net
+
+  inventory-frontend:
+    build: ./Inventory/Inventory_UI
+    container_name: inventory-frontend-container
+    ports:
+      - "7010:80"
+    networks:
+      - disaster-relief-net
+
+  communication-frontend:
+    build: ./Communication/Frontend
+    container_name: communication-frontend-container
+    ports:
+      - "6010:80"
+    networks:
+      - disaster-relief-net
+
+  volunteer-frontend:
+    build: ./Volunteer/Frontend
+    container_name: volunteer-frontend-container
+    ports:
+      - "9010:80"
+    networks:
+      - disaster-relief-net

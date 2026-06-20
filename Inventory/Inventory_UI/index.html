@@ -8,464 +8,436 @@
     <link rel="icon" href="data:,">
 
     <style>
-body{
-    background:#F1F5F9;
-    min-height:100vh;
-}
+        body {
+            background: #F1F5F9;
+            min-height: 100vh;
+        }
 
-/* HEADER */
-.main-header{
-    background:linear-gradient(135deg,#0F172A,#1E3A8A);
-    color:white;
-    height:80px;
-    position:fixed;
-    top:0;
-    left:250px;
-    right:0;
-    z-index:1000;
-    display:flex;
-    align-items:center;
-    padding:0 30px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.15);
-}
+        /* HEADER */
+        .main-header {
+            background: linear-gradient(135deg, #0F172A, #1E3A8A);
+            color: white;
+            height: 80px;
+            position: fixed;
+            top: 0;
+            left: 250px;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
 
-/* SIDEBAR */
-.sidebar{
-    width:250px;
-    height:100vh;
-    position:fixed;
-    top:0;
-    left:0;
-    background:#1E293B;
-    color:white;
-    z-index:1001;
-    box-shadow:4px 0 15px rgba(0,0,0,0.15);
-}
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #1E293B;
+            color: white;
+            z-index: 1001;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+        }
 
-.sidebar-brand{
-    height:80px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:1.3rem;
-    font-weight:700;
-    background:#0F172A;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-}
+        .sidebar-brand {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: #0F172A;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-.sidebar .nav-link{
-    color:#CBD5E1;
-    padding:15px 25px;
-    font-weight:500;
-    border-radius:10px;
-    margin:5px 10px;
-    transition:all 0.3s ease;
-}
+        .sidebar .nav-link {
+            color: #CBD5E1;
+            padding: 15px 25px;
+            font-weight: 500;
+            border-radius: 10px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
 
-.sidebar .nav-link:hover{
-    background:#3B82F6;
-    color:white;
-    transform:translateX(5px);
-}
+        .sidebar .nav-link:hover {
+            background: #3B82F6;
+            color: white;
+            transform: translateX(5px);
+        }
 
-.sidebar .nav-link.active{
-    background:#2563EB;
-    color:white;
-}
+        .sidebar .nav-link.active {
+            background: #2563EB;
+            color: white;
+        }
 
-/* MAIN CONTENT */
-.main-content{
-    margin-left:250px;
-    margin-top:100px;
-    padding:30px;
-}
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            margin-top: 100px;
+            padding: 30px;
+        }
 
-/* CARD */
-.card{
-    border:none;
-    border-radius:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.08);
-}
+        /* CARD */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
 
-.card-header{
-    background:#EFF6FF;
-    color:#1E40AF;
-    font-weight:bold;
-}
+        .card-header {
+            background: #EFF6FF;
+            color: #1E40AF;
+            font-weight: bold;
+        }
 
-/* BUTTONS */
-.btn-primary{
-    background:#2563EB;
-    border:none;
-}
+        /* BUTTONS */
+        .btn-primary {
+            background: #2563EB;
+            border: none;
+        }
 
-.btn-primary:hover{
-    background:#1D4ED8;
-}
-</style>
+        .btn-primary:hover {
+            background: #1D4ED8;
+        }
+    </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-
-    <div class="sidebar-brand">
-    </div>
-
+    <div class="sidebar-brand"></div>
     <ul class="nav flex-column mt-3">
-
-        <li class="nav-item">
-            <a class="nav-link" href="/reports/index.html">
-                Reporting Service
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="/volunteers/index.html">
-                Volunteer Task Service
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link active" href="/resources/index.html">
-                Inventory Service
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="/communications/index.html">
-                Communication Service
-            </a>
-        </li>
-
+        <li class="nav-item"><a class="nav-link" href="http://localhost:5010/">Reporting</a></li>
+        <li class="nav-item"><a class="nav-link" href="http://localhost:9010/">Volunteer Task</a></li>
+        <li class="nav-item"><a class="nav-link active" href="http://localhost:7010/">Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" href="http://localhost:6010/">Communication</a></li>
     </ul>
-
 </div>
 
-<!-- TOP HEADER -->
 <header class="main-header">
-
     <div class="d-flex justify-content-between align-items-center w-100">
-
         <div>
-            <h3 class="mb-0 fw-bold">
-                Disaster Relief Coordination Platform
-            </h3>
+            <h3 class="mb-0 fw-bold">Disaster Relief Coordination Platform</h3>
         </div>
-
         <div class="d-flex align-items-center gap-3">
-
-    <div class="dropdown">
-
-        <button
-            class="btn btn-light position-relative rounded-pill fw-semibold shadow-sm"
-            type="button"
-            data-bs-toggle="dropdown"
-            onclick="fetchNotifications()">
-
-            🔔 Alerts
-
-            <span
-                class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-white rounded-circle"
-                id="notificationBadge">
-            </span>
-
-        </button>
-
-        <ul
-            class="dropdown-menu dropdown-menu-end shadow"
-            id="notificationList"
-            style="width:320px;max-height:400px;overflow-y:auto;">
-        </ul>
-
-    </div>
-
-    <button
-        class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm"
-        onclick="logout()">
-
-        Logout
-
-    </button>
-
-</div>
-
-    </div>
-
-</header>
-                    
-                    <div class="d-flex align-items-center">
-                        <div class="dropdown">
-                            <button class="btn btn-light border text-dark position-relative rounded-pill fw-semibold shadow-sm" type="button" data-bs-toggle="dropdown" onclick="fetchNotifications()">
-                                🔔 Alerts
-                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-2 border-white rounded-circle" id="notificationBadge">
-                                    <span class="visually-hidden">New alerts</span>
-                                </span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3" id="notificationList" style="width: 320px; max-height: 400px; overflow-y: auto;">
-                                <li><span class="dropdown-item text-muted text-center py-3">Click to load notifications...</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="dropdown">
+                <button class="btn btn-light position-relative rounded-pill fw-semibold shadow-sm" type="button" data-bs-toggle="dropdown" onclick="fetchNotifications()">
+                    🔔 Alerts
+                    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-white rounded-circle" id="notificationBadge"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow" id="notificationList" style="width:320px;max-height:400px;overflow-y:auto;"></ul>
             </div>
-        </nav>
-    </header>
+            <button class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm" onclick="logout()">Logout</button>
+        </div>
+    </div>
+</header>
 
 <div class="main-content">
         
-        <div class="mb-4 border-start border-primary border-4 ps-3">
-            <h2 class="text-dark fw-bold mb-0">Victim / Volunteer Portal</h2>
-        </div>
+    <div class="mb-4 border-start border-primary border-4 ps-3">
+        <h2 class="text-dark fw-bold mb-0">Victim / Volunteer Portal</h2>
+    </div>
 
-        <div class="card shadow-sm mb-4 border-0 rounded-3">
-            <div class="card-header bg-white border-bottom py-3">
-                <h5 class="mb-0 text-primary fw-bold">Find & Request Resources</h5>
+    <div class="card shadow-sm mb-4 border-0 rounded-3">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 text-primary fw-bold">Find & Request Resources</h5>
+        </div>
+        <div class="card-body p-4 bg-white">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold text-dark">Item Name (e.g., Water, Medical Kit, Blanket)</label>
+                    <input type="text" id="searchKeyword" class="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Search for supplies...">
+                </div>
+                <div class="col-md-4 mt-3 mt-md-0">
+                    <label class="form-label fw-bold text-dark">Filter by Type</label>
+                    <select id="filterType" class="form-select form-select-lg bg-light border-0 shadow-sm">
+                        <option value="">All Types</option>
+                        <option value="food">Food</option>
+                        <option value="drink">Drink</option>
+                        <option value="medicine">Medicine</option>
+                        <option value="toiletries">Toiletries</option>
+                        <option value="tools">Tools</option>
+                        <option value="clothing">Clothing</option>
+                    </select>
+                </div>
             </div>
-            <div class="card-body p-4 bg-white">
-                <div class="row mb-4">
-                    <div class="col-md-8">
-                        <label class="form-label fw-bold text-dark">Item Name (e.g., Water, Medical Kit, Blanket)</label>
-                        <input type="text" id="searchKeyword" class="form-control form-control-lg bg-light border-0 shadow-sm" placeholder="Search for supplies...">
+            <button id="searchBtn" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm fw-bold" onclick="initiateSearch()">Search Supplies Near Me</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3" id="resultsArea" style="display: none;">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="mb-0 text-success fw-bold">Available Relief Centers (within 50km)</h5>
+        </div>
+        <div class="card-body p-0 bg-white">
+            <ul class="list-group list-group-flush rounded-bottom" id="resultsList"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title fw-bold text-primary">Request Supplies</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="requestForm" onsubmit="submitRequest(event)">
+                <div class="modal-body bg-white">
+                    <input type="hidden" id="modalCenterName">
+                    
+                    <div class="alert alert-primary bg-primary-subtle border-0 shadow-sm rounded-3 text-dark">
+                        <p class="mb-1"><strong>Relief Center:</strong> <span id="displayCenterName"></span></p>
+                        <p class="mb-0"><strong>Available Stock:</strong> <span id="displayStock" class="badge bg-primary rounded-pill"></span></p>
                     </div>
-                    <div class="col-md-4 mt-3 mt-md-0">
-                        <label class="form-label fw-bold text-dark">Filter by Type</label>
-                        <select id="filterType" class="form-select form-select-lg bg-light border-0 shadow-sm">
-                            <option value="">All Types</option>
-                            <option value="food">Food</option>
-                            <option value="drink">Drink</option>
-                            <option value="medicine">Medicine</option>
-                            <option value="toiletries">Toiletries</option>
-                            <option value="tools">Tools</option>
-                            <option value="clothing">Clothing</option>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Quantity Needed</label>
+                        <input type="number" id="requestQuantity" class="form-control form-control-lg bg-light border-0 shadow-sm" min="1" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">Urgency Status</label>
+                        <select id="requestUrgency" class="form-select form-select-lg bg-light border-0 shadow-sm">
+                            <option value="Low">Low (Within 24 Hours)</option>
+                            <option value="High">High (Immediate Need)</option>
                         </select>
+                        <div class="form-text mt-2">High urgency requests are prioritized by the Reporting Module.</div>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm fw-bold" onclick="findResources()">Search Supplies</button>
-            </div>
-        </div>
-
-        <div class="card shadow-sm border-0 rounded-3" id="resultsArea" style="display: none;">
-            <div class="card-header bg-white border-bottom py-3">
-                <h5 class="mb-0 text-success fw-bold">Available Relief Centers (within 50km)</h5>
-            </div>
-            <div class="card-body p-0 bg-white">
-                <ul class="list-group list-group-flush rounded-bottom" id="resultsList"></ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header bg-white border-bottom">
-                    <h5 class="modal-title fw-bold text-primary">Request Supplies</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-footer border-top bg-white rounded-bottom">
+                    <button type="button" class="btn btn-light rounded-pill px-4 border shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">Submit Request</button>
                 </div>
-                <form id="requestForm" onsubmit="submitRequest(event)">
-                    <div class="modal-body bg-white">
-                        <input type="hidden" id="modalCenterName">
-                        
-                        <div class="alert alert-primary bg-primary-subtle border-0 shadow-sm rounded-3 text-dark">
-                            <p class="mb-1"><strong>Relief Center:</strong> <span id="displayCenterName"></span></p>
-                            <p class="mb-0"><strong>Available Stock:</strong> <span id="displayStock" class="badge bg-primary rounded-pill"></span></p>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-dark">Quantity Needed</label>
-                            <input type="number" id="requestQuantity" class="form-control form-control-lg bg-light border-0 shadow-sm" min="1" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-dark">Urgency Status</label>
-                            <select id="requestUrgency" class="form-select form-select-lg bg-light border-0 shadow-sm">
-                                <option value="Low">Low (Within 24 Hours)</option>
-                                <option value="High">High (Immediate Need)</option>
-                            </select>
-                            <div class="form-text mt-2">High urgency requests are prioritized by the Reporting Module.</div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top bg-white rounded-bottom">
-                        <button type="button" class="btn btn-light rounded-pill px-4 border shadow-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">Submit Request</button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        const GATEWAY_URL = 'http://localhost:4000';
+<script>
+    const GATEWAY_URL = 'http://localhost:4000';
+    
+    let currentItemId = ''; 
+    let requestModal; 
+    let currentMaxStock = 0; 
+
+    // --- NEW: Geolocation & Search Orchestration ---
+    function initiateSearch() {
+        const searchBtn = document.getElementById('searchBtn');
         
-        let currentItemId = ''; 
-        let requestModal; 
-        let currentMaxStock = 0; 
-
-        async function fetchNotifications() {
-            const list = document.getElementById('notificationList');
-            const badge = document.getElementById('notificationBadge');
-            
-            if (badge) badge.classList.add('d-none'); 
-            
-            list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">Loading...</span></li>';
-
-            try {
-                const response = await fetch(`${GATEWAY_URL}/api/notifications/history`);
-                
-                if (response.ok) {
-                    const notifications = await response.json();
-                    list.innerHTML = ''; 
-                    
-                    if (notifications.length === 0) {
-                        list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">No new alerts.</span></li>';
-                    } else {
-                        notifications.forEach(notif => {
-                            const date = new Date(notif.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            
-                            list.innerHTML += `
-                                <li>
-                                    <div class="dropdown-item border-bottom py-3 list-group-item-action text-wrap">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <strong>${notif.priority === 'HIGH' ? '<span class="text-danger">🚨 Critical Alert</span>' : '<span class="text-primary">ℹ️ System Update</span>'}</strong>
-                                            <span class="badge bg-light text-dark border rounded-pill">${date}</span>
-                                        </div>
-                                        <p class="mb-0 text-dark small">${notif.message}</p>
-                                    </div>
-                                </li>
-                            `;
-                        });
-                    }
-                } else {
-                    throw new Error('Failed to load');
-                }
-            } catch (error) {
-                console.error("Failed to load notifications:", error);
-                list.innerHTML = '<li><span class="dropdown-item text-danger text-center py-3">Failed to connect to Database.</span></li>';
-            }
+        // 1. Check if browser supports GPS
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser. Cannot filter by 50km radius.");
+            return;
         }
 
-        function findResources() {
-            const keyword = document.getElementById('searchKeyword').value.trim();
-            const itemType = document.getElementById('filterType').value;
-            
-            const queryParams = new URLSearchParams();
-            if (keyword) queryParams.append('keyword', keyword);
-            if (itemType) queryParams.append('itemType', itemType);
+        // 2. Set UI to Loading State
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '📍 Getting GPS Location & Searching...';
 
-            fetch(`${GATEWAY_URL}/api/v1/public/inventory/search?${queryParams.toString()}`)
-                .then(response => response.json())
-                .then(data => displayResults(data))
-                .catch(err => {
-                    console.error(err);
-                    alert("Error fetching data. Is your API Gateway running on Port 4000?");
-                });
-        }
-
-        function displayResults(data) {
-            const resultsArea = document.getElementById('resultsArea');
-            const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = '';
-
-            if (!data || data.length === 0) {
-                resultsList.innerHTML = '<li class="list-group-item text-danger text-center py-4 fw-bold border-0">No matching supplies found within 50km.</li>';
-            } else {
-                data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center p-4 border-bottom';
-                    
-                    li.innerHTML = `
-                        <div>
-                            <h5 class="mb-1 fw-bold text-dark">${item.centerId.name}</h5>
-                            <small class="text-secondary d-block mb-2 fs-6">Item: <strong class="text-dark">${item.itemName}</strong> &bull; Type: <span class="text-capitalize text-dark">${item.itemType}</span></small>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 shadow-sm border border-success-subtle">Stock Available: ${item.availableStock}</span>
-                        </div>
-                        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" 
-                            onclick="openModal('${item.itemId}', '${item.centerId.name}', ${item.availableStock})">
-                            Request
-                        </button>
-                    `;
-                    resultsList.appendChild(li);
-                });
+        // 3. Ask for Location
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // Success! Pass coords to our actual fetch function
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                executeSearchQuery(userLat, userLon);
+            },
+            (error) => {
+                // User denied permission or GPS failed
+                console.error("GPS Error:", error);
+                alert("Please allow location access so we can find relief centers near you.");
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = 'Search Supplies Near Me';
             }
-            resultsArea.style.display = 'block';
-        }
-
-        function openModal(itemId, centerName, availableStock) {
-            currentItemId = itemId; 
-            currentMaxStock = availableStock; 
-            
-            document.getElementById('modalCenterName').value = centerName;
-            document.getElementById('displayCenterName').innerText = centerName;
-            document.getElementById('displayStock').innerText = availableStock;
-            
-            const qtyInput = document.getElementById('requestQuantity');
-            qtyInput.setAttribute('max', availableStock);
-            qtyInput.value = ''; 
-
-            if (!requestModal) {
-                requestModal = new bootstrap.Modal(document.getElementById('requestModal'));
-            }
-            requestModal.show();
-        }
-
-        async function submitRequest(event) {
-            event.preventDefault(); 
-
-            const centerName = document.getElementById('modalCenterName').value;
-            const quantity = parseInt(document.getElementById('requestQuantity').value);
-            const urgency = document.getElementById('requestUrgency').value;
-
-            if(quantity > currentMaxStock) {
-                alert("You cannot request more than the available stock.");
-                return;
-            }
-
-            const requestData = {
-                itemId: currentItemId, 
-                centerName: centerName,
-                quantityNeeded: quantity,
-                urgency: urgency 
-            };
-
-            try {
-                const response = await fetch(`${GATEWAY_URL}/api/v1/public/inventory/request`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestData)
-                });
-
-                if (response.ok) {
-                    alert('Request approved! The relief center inventory has been updated.');
-                    requestModal.hide(); 
-                    findResources(); 
-                } else {
-                    const errorData = await response.json();
-                    alert(`Failed to submit: ${errorData.error || 'Check stock levels.'}`);
-                }
-            } catch (error) {
-                console.error("Error submitting request:", error);
-                alert("Cannot connect to API Gateway. Is your router service operational?");
-            }
-        }
-        function logout() {
-
-    if(confirm("Are you sure you want to logout?")) {
-
-        // Clear session storage
-        sessionStorage.clear();
-
-        // Clear local storage
-        localStorage.clear();
-
-        // Redirect to Authentication Service
-        window.location.href = "http://localhost:7000/login.html";
-
-        // Alternative paths:
-        // window.location.href = "/auth/login.html";
-        // window.location.href = "/authentication/index.html";
+        );
     }
+
+    // --- UPDATED: Passing coordinates to API Gateway ---
+    function executeSearchQuery(lat, lon) {
+    const keyword = document.getElementById('searchKeyword').value.trim();
+    const itemType = document.getElementById('filterType').value;
+    const searchBtn = document.getElementById('searchBtn');
+    
+    const queryParams = new URLSearchParams();
+    if (keyword) queryParams.append('keyword', keyword);
+    if (itemType) queryParams.append('itemType', itemType);
+    
+    // Append user coordinates for the GIS Service
+    queryParams.append('lat', lat);
+    queryParams.append('lon', lon);
+
+    // Make the call to the Resource Service / Gateway
+    fetch(`${GATEWAY_URL}/api/v1/public/inventory/search?${queryParams.toString()}`)
+        .then(async response => {
+            // 🛑 THE FIX: Explicitly check if the server returned an error code (400, 500)
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({})); 
+                throw new Error(errorData.error || `Server Error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayResults(data);
+            // Reset Button
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = 'Search Supplies Near Me';
+        })
+        .catch(err => {
+            console.error("Search Request Failed:", err);
+            // Now this will properly alert you to backend issues!
+            alert(err.message || "Error fetching data. Is your API Gateway running?");
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = 'Search Supplies Near Me';
+        });
 }
-    </script>
+
+    // --- UPDATED: Displaying the distance ---
+    function displayResults(data) {
+        const resultsArea = document.getElementById('resultsArea');
+        const resultsList = document.getElementById('resultsList');
+        resultsList.innerHTML = '';
+
+        // Check if data has the "nearbyCenters" array from your new GIS logic
+        // (Fallback to 'data' directly if Gateway returns the raw array)
+        const centersArray = data.nearbyCenters ? data.nearbyCenters : data;
+
+        if (!centersArray || centersArray.length === 0) {
+            resultsList.innerHTML = '<li class="list-group-item text-danger text-center py-4 fw-bold border-0">No matching supplies found within 50km.</li>';
+        } else {
+            centersArray.forEach(item => {
+                
+                // Format distance if the GIS service provided it
+                let distanceHtml = '';
+                if(item.distanceFromUserMeters) {
+                    const km = (item.distanceFromUserMeters / 1000).toFixed(1);
+                    distanceHtml = `<span class="badge bg-secondary rounded-pill ms-2">📍 ${km} km away</span>`;
+                }
+
+                const li = document.createElement('li');
+                li.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center p-4 border-bottom';
+                
+                li.innerHTML = `
+                    <div>
+                        <h5 class="mb-1 fw-bold text-dark">${item.centerName || item.centerId?.name} ${distanceHtml}</h5>
+                        <small class="text-secondary d-block mb-2 fs-6">Item: <strong class="text-dark">${item.itemName}</strong></small>
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 shadow-sm border border-success-subtle">Stock Available: ${item.availableQuantity || item.availableStock}</span>
+                    </div>
+                    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" 
+                        onclick="openModal('${item.itemId}', '${item.centerName || item.centerId?.name}', ${item.availableQuantity || item.availableStock})">
+                        Request
+                    </button>
+                `;
+                resultsList.appendChild(li);
+            });
+        }
+        resultsArea.style.display = 'block';
+    }
+
+    function openModal(itemId, centerName, availableStock) {
+        currentItemId = itemId; 
+        currentMaxStock = availableStock; 
+        
+        document.getElementById('modalCenterName').value = centerName;
+        document.getElementById('displayCenterName').innerText = centerName;
+        document.getElementById('displayStock').innerText = availableStock;
+        
+        const qtyInput = document.getElementById('requestQuantity');
+        qtyInput.setAttribute('max', availableStock);
+        qtyInput.value = ''; 
+
+        if (!requestModal) {
+            requestModal = new bootstrap.Modal(document.getElementById('requestModal'));
+        }
+        requestModal.show();
+    }
+
+    async function submitRequest(event) {
+        event.preventDefault(); 
+
+        const centerName = document.getElementById('modalCenterName').value;
+        const quantity = parseInt(document.getElementById('requestQuantity').value);
+        const urgency = document.getElementById('requestUrgency').value;
+
+        if(quantity > currentMaxStock) {
+            alert("You cannot request more than the available stock.");
+            return;
+        }
+
+        const requestData = {
+            itemId: currentItemId, 
+            centerName: centerName,
+            quantityNeeded: quantity,
+            urgency: urgency 
+        };
+
+        try {
+            const response = await fetch(`${GATEWAY_URL}/api/v1/public/inventory/request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+                alert('Request logged! Stock will be updated when delivery is completed.');
+                requestModal.hide(); 
+                document.getElementById('searchBtn').click(); // Refresh search
+            } else {
+                const errorData = await response.json();
+                alert(`Failed to submit: ${errorData.error || 'Check stock levels.'}`);
+            }
+        } catch (error) {
+            console.error("Error submitting request:", error);
+            alert("Cannot connect to API Gateway.");
+        }
+    }
+
+    function logout() {
+        if(confirm("Are you sure you want to logout?")) {
+            sessionStorage.clear();
+            localStorage.clear();
+            window.location.href = "http://localhost:3010/index.html";
+        }
+    }
+
+    // Keep existing fetchNotifications unchanged
+    async function fetchNotifications() {
+        const list = document.getElementById('notificationList');
+        const badge = document.getElementById('notificationBadge');
+        if (badge) badge.classList.add('d-none'); 
+        list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">Loading...</span></li>';
+        try {
+            const response = await fetch(`${GATEWAY_URL}/api/notifications/history`);
+            if (response.ok) {
+                const notifications = await response.json();
+                list.innerHTML = ''; 
+                if (notifications.length === 0) {
+                    list.innerHTML = '<li><span class="dropdown-item text-muted text-center py-3">No new alerts.</span></li>';
+                } else {
+                    notifications.forEach(notif => {
+                        const date = new Date(notif.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        list.innerHTML += `
+                            <li>
+                                <div class="dropdown-item border-bottom py-3 list-group-item-action text-wrap">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>${notif.priority === 'HIGH' ? '<span class="text-danger">🚨 Critical Alert</span>' : '<span class="text-primary">ℹ️ System Update</span>'}</strong>
+                                        <span class="badge bg-light text-dark border rounded-pill">${date}</span>
+                                    </div>
+                                    <p class="mb-0 text-dark small">${notif.message}</p>
+                                </div>
+                            </li>
+                        `;
+                    });
+                }
+            } else { throw new Error('Failed to load'); }
+        } catch (error) {
+            console.error("Failed to load notifications:", error);
+            list.innerHTML = '<li><span class="dropdown-item text-danger text-center py-3">Notification Message Broker is unreachable.</span></li>';
+        }
+    }
+</script>
 </body>
 </html>

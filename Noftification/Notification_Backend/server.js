@@ -1,76 +1,67 @@
-const express = require('express');
-const { MongoClient } = require('mongodb'); 
 require('dotenv').config();
-const dns = require("dns"); 
+const express = require('express');
+const cors = require('cors');
 
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
+app.use(cors());
 app.use(express.json());
 
+// Message Broker Storage Queue (Acts as our event log history topic)
+const messageBrokerQueue = [];
+
+// Middlewares to simulate asynchronous ingestion broker logs
+const brokerIngestLog = (req, res, next) => {
+    console.log(`[MESSAGE BROKER] Ingesting message stream topic: ${req.method} on ${req.url}`);
+    next();
+};
+app.use(brokerIngestLog);
+
+/**
+ * TOPIC EXPOSURE: PUBLISH ALERTS
+ * Other microservices (Inventory, Comms) POST messages here to publish events
+ */
+app.post('/api/notifications/publish', (req, res) => {
+    const { message, priority, source } = req.body;
+
+    if (!message) {
+        return res.status(400).json({ error: "Broker message body content cannot be empty." });
+    }
+
+    const eventPayload = {
+        id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        message,
+        priority: priority || 'INFO',
+        source: source || 'UNKNOWN_SERVICE',
+        timestamp: new Date()
+    };
+
+    // Push into message queue loop pipeline
+    messageBrokerQueue.unshift(eventPayload);
+    
+    // Cap event cache log length to avoid container memory overflows
+    if (messageBrokerQueue.length > 100) messageBrokerQueue.pop();
+
+    console.log(`[BROKER SUCCESS] Dispatched event topic ID: ${eventPayload.id} [${eventPayload.priority}]`);
+    
+    // Acknowledge receipt instantly (Asynchronous fire-and-forget Broker pattern)
+    res.status(202).json({ status: "PUBLISHED", eventId: eventPayload.id });
+});
+
+/**
+ * TOPIC EXPOSURE: CONSUME HISTORY
+ * Frontends pull from this endpoint to consume the message logs
+ */
+app.get('/api/notifications/history', (req, res) => {
+    // Returns the current state of the message queue
+    res.status(200).json(messageBrokerQueue);
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: "UP", queueSize: messageBrokerQueue.length });
+});
+
 const PORT = process.env.PORT || 8020;
-
-let db, notificationsCollection;
-
-// Connect to MongoDB
-const client = new MongoClient(process.env.MONGO_URI);
-async function connectDB() {
-    try {
-        await client.connect();
-        db = client.db('notification_db');
-        notificationsCollection = db.collection('notifications');
-        console.log('✅ Connected to MongoDB Native Driver!');
-    } catch (error) {
-        console.error('❌ MongoDB Connection Error:', error);
-    }
-}
-connectDB();
-
-// Fetch history for the UI Bell Icon
-app.get('/api/notifications/history', async (req, res) => {
-    try {
-        const history = await notificationsCollection
-            .find({})
-            .sort({ timestamp: -1 }) // Newest first
-            .limit(50)
-            .toArray(); 
-            
-        res.status(200).json(history);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch history.' });
-    }
-});
-
-// Save to DB (No Email)
-app.post('/api/notifications/send', async (req, res) => {
-    const { message, priority } = req.body;
-
-    // Notice we removed 'recipient' and 'type' because it's strictly system-wide now!
-    if (!message || !priority) {
-        return res.status(400).json({ error: 'Missing fields.' });
-    }
-
-    try {
-        // Insert directly into the database
-        await notificationsCollection.insertOne({
-            title: priority === 'HIGH' ? 'Critical Alert' : 'Supply Request',
-            message: message,
-            priority: priority,
-            timestamp: new Date() 
-        });
-
-        console.log(`[Notification Service] In-app alert saved: ${message}`);
-
-        return res.status(200).json({
-            status: 'SUCCESS',
-            message: `In-app notification saved to database.`
-        });
-
-    } catch (error) {
-        console.error('[Notification Service Error]:', error.message);
-        return res.status(500).json({ error: error.message });
-    }
-});
-
 app.listen(PORT, () => {
-    console.log(`✅ Notification Backend running on port ${PORT}`);
+    console.log(`📟 Notification Message Broker Brokerage Engine active on port ${PORT}`);
 });

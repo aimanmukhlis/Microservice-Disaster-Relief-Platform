@@ -1,3 +1,4 @@
+// index.js (API Gateway Microservice)
 const express = require('express');
 const cors = require('cors');
 const proxy = require('express-http-proxy');
@@ -6,58 +7,78 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// 1. GLOBAL CORS CONFIGURATION - Handles port 7010 requests for ALL downstream services
+// 1. DYNAMIC GLOBAL CORS CONFIGURATION 
+// Allows ALL frontends in your ecosystem to pass authorization contexts safely
+const ALLOWED_ORIGINS = [
+    'http://localhost:3010', // Auth UI
+    'http://localhost:5010', // Reporting UI
+    'http://localhost:6010', // Comms UI
+    'http://localhost:7010', // Inventory UI
+    'http://localhost:9010'  // Volunteer UI
+];
+
 app.use(cors({
-    origin: 'http://localhost:7010',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error('CORS Policy Block: Origin not explicitly whitelisted.'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Added PATCH for reporting updates
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Logger middleware to track incoming traffic through the entry point
+// Global traffic logging middleware
 app.use((req, res, next) => {
     console.log(`[API GATEWAY] ${req.method} request intercepted routing to: ${req.url}`);
     next();
 });
 
-// 2. ROUTING RULE 1: Forward inventory traffic to the Resource Management Service (Port 7020)
+// =========================================================================
+// ROUTING TABLES (Proxying traffic internally through disaster-relief-net)
+// =========================================================================
+
+// 🔐 ROUTE 1: Authentication Engine (Port 3020)
+app.use('/api/login', proxy(process.env.AUTH_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/login${req.url}`
+}));
+app.use('/api/register', proxy(process.env.AUTH_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/register${req.url}`
+}));
+
+// 📊 ROUTE 2: Reporting Microservice (Port 5020)
+app.use('/api/reports', proxy(process.env.REPORTING_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/reports${req.url}`
+}));
+
+// 📦 ROUTE 3: Admin & Public Inventory Systems (Port 7020)
 app.use('/api/resources', proxy(process.env.RESOURCE_SERVICE_URL, {
-    proxyReqPathResolver: (req) => {
-        return `/api/v1/admin${req.url}`;
-    }
+    proxyReqPathResolver: (req) => `/api/v1/admin${req.url}`
 }));
-
-// 3. ROUTING RULE 2: Forward emergency triggers to the Notification Engine (Port 8020)
-app.use('/api/notifications', proxy(process.env.NOTIFICATION_SERVICE_URL, {
-    proxyReqPathResolver: (req) => {
-        return `/api/notifications${req.url}`;
-    }
-}));
-
-// 4. ROUTING RULE 3: Forward PUBLIC inventory requests to Resource Management Service
 app.use('/api/v1/public/inventory', proxy(process.env.RESOURCE_SERVICE_URL, {
-    proxyReqPathResolver: (req) => {
-        // This takes the incoming request and passes it perfectly to the backend
-        return `/api/v1/public/inventory${req.url}`;
-    }
+    proxyReqPathResolver: (req) => `/api/v1/public/inventory${req.url}`
 }));
 
-// 🟢 NEW: Forward Notification History requests to the Notification Service
-app.get('/api/notifications/history', async (req, res) => {
-    try {
-        // The Gateway reaches out to the hidden Notification app on the internal Docker network
-        const response = await fetch(`${process.env.NOTIFICATION_SERVICE_URL}/api/notifications/history`);
-        
-        if (!response.ok) throw new Error('Failed to fetch from Notification Service');
-        
-        const data = await response.json();
-        
-        // The Gateway hands the data back to the frontend
-        res.status(200).json(data);
-    } catch (error) {
-        console.error('[Gateway Error]: Notification Service offline', error.message);
-        res.status(500).json({ error: 'Notification Service is currently unavailable.' });
-    }
-});
+// 💬 ROUTE 4: Communication Microservice Logs (Port 6020)
+app.use('/api/communications', proxy(process.env.COMMUNICATION_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/v1/communication${req.url}`
+}));
+
+// 🪪 ROUTE 5: Volunteer Portal Engine (Port 9020)
+app.use('/api/v1/volunteers', proxy(process.env.VOLUNTEER_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/v1/volunteers${req.url}`
+}));
+
+// 🔔 ROUTE 6: Message Broker Pipeline for Notification Stream (Port 8020)
+app.use('/api/notifications', proxy(process.env.NOTIFICATION_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/notifications${req.url}`
+}));
+
+// =========================================================================
+
 // Base health check path to ensure the gateway container is alive
 app.get('/health', (req, res) => {
     res.status(200).json({ status: "UP", gateway: "Operational" });
